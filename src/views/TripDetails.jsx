@@ -432,7 +432,10 @@ const TripDetails = (props) => {
                     </TouchableOpacity>
                 }
             </View>
-            <BottomSheet sliderMinHeight={400} sliderMaxHeight={screenHeight - 100} isOpen>
+            <BottomSheet 
+            // sliderMinHeight={400} 
+            // sliderMaxHeight={screenHeight - 100} 
+            isOpen>
                 {(onScrollEndDrag) => (
                     <ScrollView onScrollEndDrag={onScrollEndDrag}>
                         {on_load == 1 ?
@@ -624,7 +627,7 @@ const styles = StyleSheet.create({
     },
     map: {
         ...StyleSheet.absoluteFillObject,
-        height: '50%'
+        // height: '50%'
     },
 });
 
