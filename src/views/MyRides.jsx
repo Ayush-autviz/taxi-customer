@@ -96,14 +96,9 @@ const MyRides = (props) => {
         );
     }
 
-    type ListItemProps = {
-        viewableItems: Animated.SharedValue<ViewToken[]>;
-        item: {
-            id: number;
-        };
-    };
 
-    const ListItem: React.FC<ListItemProps> = React.memo(
+
+    const ListItem = React.memo(
         ({ item, viewableItems }) => {
             const rStyle = useAnimatedStyle(() => {
                 const isVisible = Boolean(

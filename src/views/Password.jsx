@@ -168,7 +168,7 @@ const Password = (props) => {
                 </View>
 
             </View>
-            <DropdownAlert alert={func => (dropDownAlertRef = func)} />
+            <DropdownAlert  alert={func => (dropDownAlertRef = func)} />
         </SafeAreaView>
     );
 };
