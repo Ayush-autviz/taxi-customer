@@ -394,7 +394,7 @@ const TripDetails = (props) => {
             </MapView>
             <DropdownAlert alert={func => (dropDownAlertRef = func)} />
             <View style={{ flexDirection: 'row' }}>
-                <DropShadow
+                {/* <DropShadow
                     style={{
                         width: '50%',
                         shadowColor: "#000",
@@ -409,7 +409,7 @@ const TripDetails = (props) => {
                     <TouchableOpacity activeOpacity={0} onPress={go_back.bind(this)} style={{ width: 40, height: 40, backgroundColor: colors.theme_bg_three, borderRadius: 25, alignItems: 'center', justifyContent: 'center', top: 20, left: 20 }}>
                         <Icon type={Icons.MaterialIcons} name="arrow-back" color={colors.icon_active_color} style={{ fontSize: 22 }} />
                     </TouchableOpacity>
-                </DropShadow>
+                </DropShadow> */}
                 {on_load == 1 &&
                     <TouchableOpacity onPress={send_sos.bind(this)} activeOpacity={1} style={{ width: '50%', alignItems: 'flex-end' }}>
                         {drop_statuses.includes(data?.trip?.status) &&
@@ -624,6 +624,7 @@ const styles = StyleSheet.create({
     },
     map: {
         ...StyleSheet.absoluteFillObject,
+        height: '50%'
     },
 });
 

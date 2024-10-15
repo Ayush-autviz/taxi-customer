@@ -265,36 +265,36 @@ const Splash = (props) => {
   }
 
   const navigate = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "Home" }],
-      })
-    );
-    // if (global.existing == 1) {
-    //   if (global.id > 0) {
-    //     navigation.dispatch(
-    //       CommonActions.reset({
-    //         index: 0,
-    //         routes: [{ name: "Home" }],
-    //       })
-    //     );
-    //   } else {
-    //     navigation.dispatch(
-    //       CommonActions.reset({
-    //         index: 0,
-    //         routes: [{ name: "CheckPhone" }],
-    //       })
-    //     );
-    //   }
-    // } else {
-    //   navigation.dispatch(
-    //     CommonActions.reset({
-    //       index: 0,
-    //       routes: [{ name: "Intro" }],
-    //     })
-    //   );
-    // }
+    // navigation.dispatch(
+    //   CommonActions.reset({
+    //     index: 0,
+    //     routes: [{ name: "Home" }],
+    //   })
+    // );
+    if (global.existing == 1) {
+      if (global.id > 0) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Home" }],
+          })
+        );
+      } else {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "CheckPhone" }],
+          })
+        );
+      }
+    } else {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Intro" }],
+        })
+      );
+    }
   }
 
   return (
