@@ -347,6 +347,7 @@ const Wallet = (props) => {
                 title="Add Wallet"
                 message="Please enter your amount"
                 hintInput="Enter Amount"
+                hintTextColor="#000"
                 textInputProps={{ keyboardType: "numeric" }}
                 submitInput={(inputText) => { choose_payment(inputText) }}
                 closeDialog={close_dialogbox}>

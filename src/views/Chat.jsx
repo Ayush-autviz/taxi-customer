@@ -13,7 +13,8 @@ import * as colors from '../assets/css/Colors';
 import { bold, img_url, chat_bg, f_xl } from '../config/Constants';
 import Icon, { Icons } from '../components/Icons';
 import database from '@react-native-firebase/database';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 var Sound = require('react-native-sound');
 
@@ -75,7 +76,46 @@ const Chat = (props) => {
         whoosh.play();
     }
 
+    const renderInputToolbar = (props)=> {
+        //Add the extra styles via containerStyle
+       return <InputToolbar {...props} containerStyle={{
+        borderRadius: 999, // Rounded corners
+        marginHorizontal: 10, // Margins to add spacing from the sides
+        backgroundColor: '#fff', // Background color to match the rest
+        borderTopWidth: 0, // Remove any default border
+        shadowColor: 'transparent', // Remove any shadow
+        elevation: 0, // Remove shadow on Android
+    }} />
+     }
+
+    const renderBubble = (props) => {
+        return (
+            <Bubble
+                {...props}
+                wrapperStyle={{
+                    right: {
+                        backgroundColor: colors.theme_fg,
+                    },
+                    left: {
+                        backgroundColor: "#fff",  // Background color for other user's message
+                    }
+                }}
+                textStyle={{
+                    right: {
+                        color: '#fff'  // Text color for current user's message
+                    },
+                    left: {
+                        color: '#000'  // Text color for other user's message
+                    }
+                }}
+            />
+        );
+    };
+
+    
+
     return (
+        <SafeAreaView style={{flex:1}}>
         <ImageBackground
             source={chat_bg}
             resizeMode='cover'
@@ -84,6 +124,7 @@ const Chat = (props) => {
             <StatusBar
                 backgroundColor={colors.theme_bg}
             />
+
             <View style={[styles.header]}>
                 <TouchableOpacity activeOpacity={1} onPress={go_back.bind(this)} style={{ width: '15%', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon type={Icons.MaterialIcons} name="arrow-back" color={colors.theme_fg_three} style={{ fontSize: 30 }} />
@@ -92,18 +133,29 @@ const Chat = (props) => {
                     <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_three, fontSize: f_xl, fontFamily: bold }}>Chat with driver</Text>
                 </View>
             </View>
+           
             <GiftedChat
+        
                 messages={messages}
                 onSend={messages => onSend(messages)}
-                textInputStyle={{color:colors.theme_fg_two, height:50}}
+                textInputStyle={{
+                    color: colors.theme_fg_two, 
+                    marginTop:10,
+                    padding:5
+
+                }}
                 user={{
                     _id: global.id+'-Cr',
                     name: global.first_name,
                     avatar: img_url + global.profile_picture
                 }}
                 showUserAvatar
+                renderInputToolbar={renderInputToolbar} 
+                renderBubble={renderBubble} 
             />
+          
         </ImageBackground>
+        </SafeAreaView>
     );
 };
 
