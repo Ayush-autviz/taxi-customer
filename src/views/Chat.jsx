@@ -34,6 +34,7 @@ const Chat = (props) => {
     const navigation = useNavigation();
     const route = useRoute();
     const [trip_id,setTripId] = useState(route.params.trip_id)
+    const [first_name, setfirst_name] = useState(route.params.first_name)
     const [messages,setMessages] = useState([])
     
     const go_back = () => {
@@ -130,7 +131,7 @@ const Chat = (props) => {
                     <Icon type={Icons.MaterialIcons} name="arrow-back" color={colors.theme_fg_three} style={{ fontSize: 30 }} />
                 </TouchableOpacity>
                 <View activeOpacity={1} style={{ width: '85%', alignItems: 'flex-start', justifyContent: 'center' }}>
-                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_three, fontSize: f_xl, fontFamily: bold }}>Chat with driver</Text>
+                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_three, fontSize: f_xl, fontFamily: bold }}>{`Chat with ${first_name}`}</Text>
                 </View>
             </View>
            

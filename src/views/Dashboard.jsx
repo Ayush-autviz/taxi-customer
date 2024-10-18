@@ -14,6 +14,7 @@ import {
   Keyboard,
   FlatList,
   TextInput,
+  Alert,
 } from "react-native";
 import { connect } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -1168,6 +1169,18 @@ const Dashboard = (props) => {
       })
       .catch((error) => {
         setLoading(false);
+        console.log('EF',{customer_id: global.id,
+          pickup_lat: lat1,
+          pickup_lng: lng1,
+          drop_lat: lat2,
+          drop_lng: lng2,
+          trip_type: active_trip_type,
+          promo: pr,
+          lang: global.lang,
+          package_id: package_id,
+          days: 1,
+          trip_sub_type: sub_type,});
+        
         alert("Sorry something went wrong");
       });
   };
@@ -1241,7 +1254,8 @@ const Dashboard = (props) => {
         drop_lng: drop_lng,
         package_id: package_id,
         trip_sub_type: active_trip_sub_type,
-        stops: JSON.stringify([]),
+        // stops: JSON.stringify([]),
+        stops: [],
         zone: zone,
         contact: contact,
       },
@@ -1249,6 +1263,7 @@ const Dashboard = (props) => {
       .then(async (response) => {
         setLoading(false);
         if (response.data.status == 1) {
+          console.log('RDR', response.data.result);
           setTripRequestId(response.data.result);
           if (response.data.booking_type == 2) {
             dropDownAlertRef({
@@ -2561,7 +2576,7 @@ const Dashboard = (props) => {
       })
       .catch((error) => {
         setLoading(false);
-        console.log(error);
+        console.log('cancel request func ',error);
       });
   };
 

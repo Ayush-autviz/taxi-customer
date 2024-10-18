@@ -251,7 +251,7 @@ const TripDetails = (props) => {
     }
 
     const move_chat = () => {
-        navigation.navigate('Chat', { trip_id: trip_id });
+        navigation.navigate('Chat', { trip_id: trip_id, first_name: data?.trip?.driver?.first_name});
     }
 
     const send_sos = async () => {
@@ -455,7 +455,7 @@ const TripDetails = (props) => {
                                             <Text numberOfLines={1} style={{ color: colors.theme_fg_two, fontSize: 17, fontFamily: bold }}>{data?.trip?.driver?.first_name}</Text>
                                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                                 <Icon type={Icons.MaterialIcons} name="star" color={colors.warning} style={{ fontSize: 18 }} />
-                                                <Text numberOfLines={1} style={{ color: colors.grey, fontSize: 13, fontFamily: regular }}>{data?.trip?.driver.overall_ratings}</Text>
+                                                <Text numberOfLines={1} style={{ color: colors.grey, fontSize: 13, fontFamily: regular }}>{data?.trip?.driver?.overall_ratings}</Text>
                                             </View>
                                         </View>
                                         <View style={{ width: '35%', alignItems: 'center', justifyContent: 'center' }}>
