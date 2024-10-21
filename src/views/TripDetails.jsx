@@ -58,6 +58,11 @@ const TripDetails = (props) => {
     const [home_marker, setHomeMarker] = useState({ latitude: parseFloat(route?.params?.data?.trip?.pickup_lat), longitude: parseFloat(route?.params?.data?.trip?.pickup_lng) });
     const [destination_marker, setDestinaionMarker] = useState({ latitude: parseFloat(route?.params?.data?.trip?.drop_lat), longitude: parseFloat(route?.params?.data?.trip?.drop_lng) });
     const [bearing, setBearing] = useState(0);
+
+    let dropDownAlertRef = useRef(
+        (_data?: DropdownAlertData) =>
+          new Promise() < DropdownAlertData > ((res) => res)
+      );
     const go_back = () => {
         if (from == 'home') {
             navigation.navigate('Dashboard')
@@ -205,6 +210,11 @@ const TripDetails = (props) => {
                         );
                     }
                 } else if (cancellation_statuses.includes(parseInt(response?.data?.result?.trip?.status)) && from == 'home') {
+                    dropDownAlertRef({
+                        type: DropdownAlertType.Info,
+                        title: 'Done',
+                        message: 'Your trip has been cancelled!',
+                      });
                     navigate_home();
                 }
             })
