@@ -35,7 +35,7 @@ const TripDetails = (props) => {
     const route = useRoute();
     const map_ref = useRef();
     //const driver_loc = useRef();
-    let dropDownAlertRef = useRef();
+    // let dropDownAlertRef = useRef();
     const [region, setRegion] = useState(props.initial_region);
     const [loading, setLoading] = useState(false);
     const [cancel_loading, setCancelLoading] = useState(false);
@@ -212,10 +212,12 @@ const TripDetails = (props) => {
                 } else if (cancellation_statuses.includes(parseInt(response?.data?.result?.trip?.status)) && from == 'home') {
                     dropDownAlertRef({
                         type: DropdownAlertType.Info,
-                        title: 'Done',
+                        title: 'Cancelled',
                         message: 'Your trip has been cancelled!',
                       });
-                    navigate_home();
+                      setTimeout(() => {
+                          navigate_home();
+                      }, 3000);
                 }
             })
             .catch(error => {
