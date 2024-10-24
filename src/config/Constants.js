@@ -1,9 +1,9 @@
 import { Dimensions } from "react-native";
 
 export const app_name = "Taxi2Door";
-export const base_url = "https://04fe-110-227-188-60.ngrok-free.app/";
-export const api_url = "https://04fe-110-227-188-60.ngrok-free.app/api/";
-export const img_url = "https://04fe-110-227-188-60.ngrok-free.app/uploads/";
+export const base_url = "https://auttaxi.autviz.com/";
+export const api_url = "https://auttaxi.autviz.com/api/";
+export const img_url = "https://auttaxi.autviz.com/uploads/";
 export const prefix = "customer/";
 export const failed_url = "paypal_failed";
 export const success_url = "paypal_success";

@@ -61,6 +61,7 @@ import DropdownAlert, {
 import database from "@react-native-firebase/database";
 import Modal from "react-native-modal";
 import Dialog from "react-native-dialog";
+import PhoneInput from "react-native-phone-input";
 
 const Dashboard = (props) => {
   //used in focus event listner and opening of drawer(react-navigation - something new )
@@ -2472,14 +2473,30 @@ const Dashboard = (props) => {
             Someone else taking this ride ?
           </Text>
           <View style={{ margin: 5 }} />
-          <TextInput
+          {/* <TextInput
             ref={inputRef}
             secureTextEntry={false}
             placeholder="Enter Contact Number"
             placeholderTextColor={colors.grey}
             style={styles.textinput}
             onChangeText={(TextInputValue) => setContactNumber(TextInputValue)}
-          />
+          /> */}
+          <PhoneInput 
+            style={{ borderBottomColor: colors.theme_bg_two }}
+            flagStyle={styles.flag_style}
+            ref={inputRef}
+            initialCountry="in" 
+            offset={10}
+            textStyle={styles.country_text}
+            onPressFlag={() => {}}
+            textProps={{
+              placeholder: 'Enter Contact Number',
+              placeholderTextColor: colors.theme_fg_two
+            }}
+            onChangePhoneNumber={(TextInputValue) => setContactNumber(TextInputValue)}
+            autoFormat={true}
+            
+             />
         </View>
         <View style={{ margin: 10 }} />
         <View style={{ flexDirection: "row", width: "100%" }}>
@@ -2895,6 +2912,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: normal,
   },
+  flag_style: {
+    width: 38,
+    height: 24
+},
   segment_active_bg: {
     width: "48%",
     alignItems: "center",
@@ -2935,6 +2956,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.text_container_bg,
     width: "100%",
   },
+  country_text: {
+    fontSize: 18,
+    borderBottomWidth: 1,
+    paddingBottom: 8,
+    height: 35,
+    fontFamily: regular,
+    color: colors.theme_fg_two
+},
 });
 
 function mapStateToProps(state) {
