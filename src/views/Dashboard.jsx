@@ -15,6 +15,7 @@ import {
   FlatList,
   TextInput,
   Alert,
+  
 } from "react-native";
 import { connect } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -226,6 +227,7 @@ const Dashboard = (props) => {
   };
 
   const booking_sync = () => {
+    console.log(global.id,'global id');
     database()
       .ref(`customers/${global.id}`)
       .on("value", (snapshot) => {
@@ -2599,8 +2601,8 @@ const Dashboard = (props) => {
 
   const search_dialog = () => {
     return (
-      <Dialog.Container visible={search_status} width="90%">
-        <Dialog.Description>
+      <Modal isVisible={search_status} width="90%">
+        {/* <Dialog.Description> */}
           <View
             style={{
               padding: 10,
@@ -2646,7 +2648,7 @@ const Dashboard = (props) => {
                 </Text>
               </TouchableOpacity>
             ) : (
-              <View style={{ height: 50, width: "90%", alignSelf: "center" }}>
+              <View style={{ height: 50, width: "100%", alignSelf: "center" }}>
                 <LottieView
                   style={{ flex: 1 }}
                   source={btn_loader}
@@ -2656,8 +2658,8 @@ const Dashboard = (props) => {
               </View>
             )}
           </View>
-        </Dialog.Description>
-      </Dialog.Container>
+        {/* </Dialog.Description> */}
+      </Modal>
     );
   };
 

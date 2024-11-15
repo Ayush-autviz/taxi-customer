@@ -165,12 +165,12 @@ const MyRides = (props) => {
                             </View>
                             <View style={{ bottomBorderWidth: 0.5, borderColor: colors.grey, height: 1 }} />
                             <View style={{ flex: 1, backgroundColor: colors.theme_bg_three, padding: 15, borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }}>
-                                <View style={{ width: '100%', alignItems: 'flex-start', justifyContent: 'center' }}>
+                                <View style={{ width: '90%', alignItems: 'flex-start', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Badge status="success" backgroundColor="green"  size={10} />
                                         <View style={{ margin: 5 }} />
                                         {item.actual_pickup_address ?
-                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: normal }}>{item.actual_pickup_address}</Text>
+                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: normal }}>{item.pickup_address}</Text>
                                             :
                                             <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: normal }}>{item.pickup_address}</Text>
                                         }
@@ -182,7 +182,7 @@ const MyRides = (props) => {
                                                 <Badge status="error"backgroundColor="red"  size={10}/>
                                                 <View style={{ margin: 5 }} />
                                                 {item.actual_drop_address ?
-                                                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: normal }}>{item.actual_drop_address}</Text>
+                                                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: normal }}>{item.drop_address}</Text>
                                                     :
                                                     <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: normal }}>{item.drop_address}</Text>
                                                 }
@@ -198,7 +198,7 @@ const MyRides = (props) => {
             </View>*/}
                                 <View style={{ margin: 5, marginTop: 10, flexDirection: 'row', width: '100%' }}>
                                     <View style={{ width: '50%', alignItems: 'flex-start', justifyContent: 'center' }}>
-                                        <Text style={{ fontSize: f_tiny, fontFamily: normal, color: colors.text_grey }}>{item.status}{Moment(item.pickup_date).format("DD-MMM-YYYY")}</Text>
+                                        <Text style={{ fontSize: f_tiny, fontFamily: normal, color: colors.text_grey }}>{Moment(item.pickup_date).format("DD-MMM-YYYY")}</Text>
                                     </View>
                                     <View style={{ width: '50%', alignItems: 'flex-start', justifyContent: 'center' }}>
                                         <Text style={{ fontSize: f_tiny, fontFamily: normal, color: colors.text_grey, alignSelf: 'flex-end' }}>{Moment(item.pickup_date).format("hh:mm a")}</Text>

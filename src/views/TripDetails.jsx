@@ -329,11 +329,11 @@ const TripDetails = (props) => {
                 setLoading(false);
                 if (response.data.status == 1) {
                     alert(response.data.message);
-                } if (response.data.status == 2) {
+                }else if (response.data.status == 2) {
                     alert(response.data.message);
                 } else {
                     Alert.alert(
-                        strings.alert,
+     //                   strings.alert,
                         response.data.message,
                         [
                             {
@@ -352,6 +352,7 @@ const TripDetails = (props) => {
             })
             .catch(error => {
                 setLoading(false);
+                console.log(error)
                 alert('Sorry something went wrong')
             });
     }
@@ -423,7 +424,7 @@ const TripDetails = (props) => {
                     </TouchableOpacity>
                 </DropShadow> */}
                 {on_load == 1 &&
-                    <TouchableOpacity onPress={send_sos.bind(this)} activeOpacity={1} style={{ width: '50%', alignItems: 'flex-end' }}>
+                    <TouchableOpacity onPress={send_sos.bind(this)} activeOpacity={1} style={{ width: '50%', alignItems: 'flex-end',position:"absolute",top:45,right:5 }}>
                         {drop_statuses.includes(data?.trip?.status) &&
                             <DropShadow
                                 style={{
@@ -436,8 +437,8 @@ const TripDetails = (props) => {
                                     shadowRadius: 25,
                                 }}
                             >
-                                <View style={{ width: 60, height: 60, backgroundColor: colors.theme_bg_three, borderRadius: 30, alignItems: 'center', justifyContent: 'center', top: 20, right: 20 }}>
-                                    <LottieView style={{flex: 1}}source={sos} autoPlay loop />
+                                <View style={{ width: 60, height: 60, backgroundColor: 'red', borderRadius: 30, alignItems: 'center', justifyContent: 'center', top: 20, right: 20 }}>
+                                  <Text style={{color:"#fff",fontWeight:"900"}}>SOS</Text>
                                 </View>
                             </DropShadow>
                         }
@@ -446,7 +447,7 @@ const TripDetails = (props) => {
             </View>
             <BottomSheet 
             // sliderMinHeight={400} 
-            // sliderMaxHeight={screenHeight - 100} 
+             sliderMaxHeight={screenHeight - 100} 
             isOpen>
                 {(onScrollEndDrag) => (
                     <ScrollView onScrollEndDrag={onScrollEndDrag}>
