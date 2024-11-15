@@ -170,8 +170,8 @@ const Profile = (props) => {
                         </TouchableOpacity>
                         <ScrollView>
                             <View style={{ alignItems: 'center' }}>
-                                <Text style={{ color: colors.theme_fg_two, fontSize: f_xl, fontFamily: bold }}>Say a little bit about yourself...</Text>
-                                <View style={{ margin: 20 }} />
+                                {/* <Text style={{ color: colors.theme_fg_two, fontSize: f_xl, fontFamily: bold }}>Say a little bit about yourself...</Text> */}
+                                {/* <View style={{ margin: 20 }} /> */}
                                 <View style={{ width: '90%' }}>
                                     <View style={{ marginBottom: 20 }}>
                                         <Text style={{ color: colors.text_grey, fontSize: f_xs, fontFamily: bold }}>First Name</Text>
