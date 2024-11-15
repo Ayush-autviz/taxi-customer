@@ -158,7 +158,7 @@ const Bill = (props) => {
                                         <View style={{ width: '90%', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                                             <Text numberOfLines={1} style={{ color: colors.grey, fontSize: f_xs, fontFamily: regular }}>Pickup Address</Text>
                                             <View style={{ margin: 2 }} />
-                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: regular }}>{data.actual_pickup_address}</Text>
+                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: regular }}>{data.pickup_address}</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -172,7 +172,7 @@ const Bill = (props) => {
                                             <View style={{ width: '90%', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                                                 <Text numberOfLines={1} style={{ color: colors.grey, fontSize: f_xs, fontFamily: regular }}>Drop Address</Text>
                                                 <View style={{ margin: 2 }} />
-                                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: regular }}>{data.actual_drop_address}</Text>
+                                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ color: colors.theme_fg_two, fontSize: f_xs, fontFamily: regular }}>{data.drop_address}</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
