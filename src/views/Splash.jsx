@@ -322,12 +322,10 @@ const styles = StyleSheet.create({
   },
   logo_container: {
     height: 200,
-    width: 300,
-
   },
   logo: {
-    height: undefined,
-    width: undefined,
+    width:300,
+    resizeMode:'contain',
     flex: 1,
     borderRadius: 10
   },

@@ -119,6 +119,7 @@ const Dashboard = (props) => {
   const [pickup_date, setPickupDate] = useState(new Date());
   //pick up date albel
   const [pickup_date_label, setPickupDateLabel] = useState("Now");
+  const [pickup_time_label, setPickupTimeLabel] = useState("");
   // stores packages
   const [packages, setPackages] = useState([]);
   //package for hour
@@ -376,13 +377,15 @@ const Dashboard = (props) => {
       (await (currentdate.getDate() < 10 ? "0" : "")) +
       currentdate.getDate() +
       " " +
-      month_names[currentdate.getMonth()] +
-      ", " +
-      formatAMPM(currentdate);
+      month_names[currentdate.getMonth()].substring(0, 3);
+      // ", " +
+      // formatAMPM(currentdate);
+    let time_label = formatAMPM(currentdate);
     if (type == 0) {
       setPickupDateLabel("Now");
     } else {
       setPickupDateLabel(label);
+      setPickupTimeLabel(time_label)
     }
 
     setPickupDate(datetime);
@@ -2114,14 +2117,14 @@ const Dashboard = (props) => {
                   ) : (
                     <View
                       style={{
-                        width: 100,
+                        width: 70,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
                       <Text
                         numberOfLines={2}
-                        ellipsizeMode="tail"
+                      //  ellipsizeMode="tail"
                         style={{
                           color: colors.theme_fg_two,
                           fontSize: 12,
@@ -2130,6 +2133,18 @@ const Dashboard = (props) => {
                       >
                         {pickup_date_label}
                       </Text>
+                      <Text
+                        numberOfLines={2}
+                      //  ellipsizeMode="tail"
+                        style={{
+                          color: colors.theme_fg_two,
+                          fontSize: 12,
+                          fontFamily: bold,
+                        }}
+                      >
+                        {pickup_time_label}
+                      </Text>
+
                     </View>
                   )}
                 </TouchableOpacity>
