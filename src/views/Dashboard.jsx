@@ -15,10 +15,14 @@ import {
   FlatList,
   TextInput,
   Alert,
-  
+  PermissionsAndroid,
 } from "react-native";
 import { connect } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import {
   screenHeight,
   screenWidth,
@@ -63,8 +67,13 @@ import database from "@react-native-firebase/database";
 import Modal from "react-native-modal";
 import Dialog from "react-native-dialog";
 import PhoneInput from "react-native-phone-input";
+import Contacts from "react-native-contacts";
 
 const Dashboard = (props) => {
+  const route = useRoute();
+  const number = route?.params?.number;
+  const from = route?.params?.from;
+
   //used in focus event listner and opening of drawer(react-navigation - something new )
   const navigation = useNavigation();
   //used in google place autocomplete there is property search.current.searchText('')
@@ -142,7 +151,7 @@ const Dashboard = (props) => {
   //trip request id
   const [trip_request_id, setTripRequestId] = useState(0);
   //contact number
-  const [contact_number, setContactNumber] = useState("");
+  const [contact_number, setContactNumber] = useState(number ? number : "");
   //never used search loading
   const [search_loading, setSearchLoading] = useState(false);
 
@@ -158,6 +167,8 @@ const Dashboard = (props) => {
   const [tmp_address, setTmpAddress] = useState("");
   const [tmp_lat, setTmpLat] = useState(props.initial_lat);
   const [tmp_lng, setTmpLng] = useState(props.initial_lng);
+
+  const [map_scroll, setMapScroll] = useState(true);
 
   //Screen Home
   const home_comp_1 = useRef(new Animated.Value(-60)).current;
@@ -199,6 +210,82 @@ const Dashboard = (props) => {
     return unsubscribe;
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (number) {
+        setContactNumber(number);
+      }
+      if (from) {
+        add_contact_RBSheet.current.open();
+      }
+    }, [number, from]) // Add number as a dependency
+  );
+
+  const trimCountryCode = (phoneNumber) => {
+    // Check if the phone number starts with +91 and remove it
+    if (phoneNumber.startsWith("+91")) {
+      // Remove the +91 and return the remaining part of the number
+      return phoneNumber.slice(3).trim();
+    }
+    return phoneNumber.trim(); // Return the number as is if +91 is not present
+  };
+
+  const getContacts = () => {
+    Contacts.getAll()
+      .then((contacts) => {
+        const filteredContacts = contacts.filter(
+          (contact) => contact.phoneNumbers && contact.phoneNumbers.length > 0
+        );
+        // setcontactList(filteredContacts);
+        navigation.navigate("ContactList", { filteredContacts });
+      })
+      .catch((e) => {
+        console.error("Failed to load contacts", e);
+      });
+  };
+
+  const requestContactsPermission = async () => {
+    if (Platform.OS === "android") {
+      const permissionStatus = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS
+      );
+
+      if (permissionStatus) {
+        // Permission already granted
+        console.log("Permission already granted");
+        getContacts();
+      } else {
+        // Request permission
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+          {
+            title: "Contacts Permission",
+            message:
+              "App needs access to your contacts to display them in the app.",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK",
+          }
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log("Contacts permission granted");
+          getContacts();
+        } else if (granted === PermissionsAndroid.RESULTS.DENIED) {
+          console.log("Contacts permission denied");
+        } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+          console.log("Contacts permission denied permanently");
+          // Optionally, show a message explaining how to enable permission manually in settings
+        }
+      }
+    }
+  };
+
+  const handleContacts = () => {
+    add_contact_RBSheet.current.close();
+    requestContactsPermission();
+    // navigation.navigate("ContactList", { contacts: contactList });
+  };
+
   const call_promo_codes = () => {
     axios({
       method: "post",
@@ -228,7 +315,7 @@ const Dashboard = (props) => {
   };
 
   const booking_sync = () => {
-    console.log(global.id,'global id');
+    console.log(global.id, "global id");
     database()
       .ref(`customers/${global.id}`)
       .on("value", (snapshot) => {
@@ -378,14 +465,14 @@ const Dashboard = (props) => {
       currentdate.getDate() +
       " " +
       month_names[currentdate.getMonth()].substring(0, 3);
-      // ", " +
-      // formatAMPM(currentdate);
+    // ", " +
+    // formatAMPM(currentdate);
     let time_label = formatAMPM(currentdate);
     if (type == 0) {
       setPickupDateLabel("Now");
     } else {
       setPickupDateLabel(label);
-      setPickupTimeLabel(time_label)
+      setPickupTimeLabel(time_label);
     }
 
     setPickupDate(datetime);
@@ -507,6 +594,7 @@ const Dashboard = (props) => {
       duration: duration,
       useNativeDriver: true,
     }).start();
+    setMapScroll(true);
   };
 
   const is_focus = () => {
@@ -1155,6 +1243,7 @@ const Dashboard = (props) => {
     })
       .then(async (response) => {
         setLoading(false);
+        console.log(response.data, "estim data");
         if (response.data.status == 1) {
           setEstimationFares(response.data.result["vehicles"]);
           setWallet(response.data.result["wallet"]);
@@ -1175,7 +1264,8 @@ const Dashboard = (props) => {
       })
       .catch((error) => {
         setLoading(false);
-        console.log('EF',{customer_id: global.id,
+        console.log("EF", {
+          customer_id: global.id,
           pickup_lat: lat1,
           pickup_lng: lng1,
           drop_lat: lat2,
@@ -1185,8 +1275,9 @@ const Dashboard = (props) => {
           lang: global.lang,
           package_id: package_id,
           days: 1,
-          trip_sub_type: sub_type,});
-        
+          trip_sub_type: sub_type,
+        });
+
         alert("Sorry something went wrong");
       });
   };
@@ -1235,7 +1326,8 @@ const Dashboard = (props) => {
       drop_lng: drop_lng,
       package_id: package_id,
       trip_sub_type: active_trip_sub_type,
-      stops: JSON.stringify([]),
+      // stops: JSON.stringify([]),
+      stops: [],
       zone: zone,
       contact: contact,
     });
@@ -1269,7 +1361,7 @@ const Dashboard = (props) => {
       .then(async (response) => {
         setLoading(false);
         if (response.data.status == 1) {
-          console.log('RDR', response.data.result);
+          console.log("RDR", response.data.result);
           setTripRequestId(response.data.result);
           if (response.data.booking_type == 2) {
             dropDownAlertRef({
@@ -2124,7 +2216,7 @@ const Dashboard = (props) => {
                     >
                       <Text
                         numberOfLines={2}
-                      //  ellipsizeMode="tail"
+                        //  ellipsizeMode="tail"
                         style={{
                           color: colors.theme_fg_two,
                           fontSize: 12,
@@ -2135,7 +2227,7 @@ const Dashboard = (props) => {
                       </Text>
                       <Text
                         numberOfLines={2}
-                      //  ellipsizeMode="tail"
+                        //  ellipsizeMode="tail"
                         style={{
                           color: colors.theme_fg_two,
                           fontSize: 12,
@@ -2144,7 +2236,6 @@ const Dashboard = (props) => {
                       >
                         {pickup_time_label}
                       </Text>
-
                     </View>
                   )}
                 </TouchableOpacity>
@@ -2152,11 +2243,18 @@ const Dashboard = (props) => {
             </DropShadow>
           </View>
 
-
           {loading ? (
-            <View style={{flex: 1, width: "90%",justifyContent: 'center', alignSelf: "center", alignItems: 'center' }}>
+            <View
+              style={{
+                flex: 1,
+                width: "90%",
+                justifyContent: "center",
+                alignSelf: "center",
+                alignItems: "center",
+              }}
+            >
               <LottieView
-                style={{width: 70, height: 70 }}
+                style={{ width: 70, height: 70 }}
                 source={btn_loader}
                 autoPlay
                 loop
@@ -2164,191 +2262,199 @@ const Dashboard = (props) => {
             </View>
           ) : (
             <>
-            <ScrollView>
-              <View
-                style={{
-                  marginTop: 10,
-                  marginBottom: 10,
-                  flexDirection: "row",
-                  flex: 1,
-                  backgroundColor: colors.theme_bg_three,
-                }}
-              >
-                {load_trip_sub_types()}
-              </View>
-              <View style={{ padding: 5 }}>
-                <Text
+              <ScrollView>
+                <View
                   style={{
-                    color: colors.theme_fg_two,
-                    fontSize: 16,
-                    fontFamily: bold,
-                  }}
-                >
-                  Available rides
-                </Text>
-                <View style={{ margin: 8 }} />
-                {estimation_fare_list()}
-              </View>
-            </ScrollView>
-          <View
-          style={{
-            height: 135,
-            alignItems: "center",
-            justifyContent: "flex-end",
-            marginBottom: Platform.OS === 'ios' ? 40 : 0,
-          }}
-          >
-            <View
-              style={{
-                width: "100%",
-                height: 30,
-                backgroundColor: colors.theme_bg,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              >
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={{
-                  color: colors.theme_fg_three,
-                  fontSize: 12,
-                  fontFamily: normal,
-                  letterSpacing: 1,
-                }}
-                >
-                You have {global.currency}
-                {wallet} in your wallet !
-              </Text>
-            </View>
-            <View style={{ height: 40, width: "100%", flexDirection: "row" }}>
-              <TouchableOpacity
-                style={{
-                  width: "46%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                }}
-                >
-                <Image source={money_icon} style={{ width: 30, height: 40 }} />
-                <View style={{ margin: 5 }} />
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    color: colors.theme_fg_two,
-                    fontSize: 16,
-                    fontFamily: bold,
-                  }}
-                  >
-                  Cash
-                </Text>
-              </TouchableOpacity>
-              <View
-                style={{
-                  margin: "2%",
-                  borderLeftWidth: 1,
-                  borderColor: colors.grey,
-                }}
-                />
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={navigate_promo.bind(this)}
-                style={{
-                  width: "49%",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                }}
-                >
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    color: colors.theme_fg_two,
-                    fontSize: 16,
-                    fontFamily: bold,
-                  }}
-                  >
-                  Coupons
-                </Text>
-                <View style={{ margin: 5 }} />
-                <Image
-                  source={discount_icon}
-                  style={{ width: 30, height: 30 }}
-                  />
-              </TouchableOpacity>
-            </View>
-            {loading == false ? (
-              <View
-              style={{
-                flexDirection: "row",
-                width: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-                height: 50,
-              }}
-              >
-                <TouchableOpacity
-                  onPress={call_zone.bind(this, "null")}
-                  activeOpacity={1}
-                  style={{
-                    width: "42%",
-                    backgroundColor: colors.btn_color,
-                    borderRadius: 10,
+                    marginTop: 10,
+                    marginBottom: 10,
                     flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    flex: 1,
+                    backgroundColor: colors.theme_bg_three,
                   }}
-                  >
+                >
+                  {load_trip_sub_types()}
+                </View>
+                <View style={{ padding: 5 }}>
                   <Text
                     style={{
                       color: colors.theme_fg_two,
                       fontSize: 16,
-                      color: colors.theme_fg_three,
                       fontFamily: bold,
-                      padding: 10,
                     }}
-                    >
-                    Book Self
+                  >
+                    Available rides
                   </Text>
-                </TouchableOpacity>
-                <View style={{ margin: 5 }} />
-                <TouchableOpacity
-                  onPress={() => add_contact_RBSheet.current.open()}
-                  activeOpacity={1}
+                  <View style={{ margin: 8 }} />
+                  {estimation_fare_list()}
+                </View>
+              </ScrollView>
+              <View
+                style={{
+                  height: 135,
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  marginBottom: Platform.OS === "ios" ? 40 : 0,
+                }}
+              >
+                <View
                   style={{
-                    width: "45%",
-                    backgroundColor: colors.btn_color,
-                    borderRadius: 10,
-                    flexDirection: "row",
+                    width: "100%",
+                    height: 30,
+                    backgroundColor: colors.theme_bg,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                  >
+                >
                   <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
                     style={{
-                      color: colors.theme_fg_two,
-                      fontSize: 16,
                       color: colors.theme_fg_three,
-                      fontFamily: bold,
-                      padding: 10,
+                      fontSize: 12,
+                      fontFamily: normal,
+                      letterSpacing: 1,
                     }}
-                    >
-                    Book for others
+                  >
+                    You have {global.currency}
+                    {wallet} in your wallet !
                   </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={{ height: 50, width: "90%", alignSelf: "center" }}>
-                <LottieView
-                  style={{ flex: 1 }}
-                  source={btn_loader}
-                  autoPlay
-                  loop
+                </View>
+                <View
+                  style={{ height: 40, width: "100%", flexDirection: "row" }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      width: "46%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Image
+                      source={money_icon}
+                      style={{ width: 30, height: 40 }}
+                    />
+                    <View style={{ margin: 5 }} />
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: colors.theme_fg_two,
+                        fontSize: 16,
+                        fontFamily: bold,
+                      }}
+                    >
+                      Cash
+                    </Text>
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      margin: "2%",
+                      borderLeftWidth: 1,
+                      borderColor: colors.grey,
+                    }}
                   />
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={navigate_promo.bind(this)}
+                    style={{
+                      width: "49%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: colors.theme_fg_two,
+                        fontSize: 16,
+                        fontFamily: bold,
+                      }}
+                    >
+                      Coupons
+                    </Text>
+                    <View style={{ margin: 5 }} />
+                    <Image
+                      source={discount_icon}
+                      style={{ width: 30, height: 30 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {loading == false ? (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      width: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: 50,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={call_zone.bind(this, "null")}
+                      activeOpacity={1}
+                      style={{
+                        width: "42%",
+                        backgroundColor: colors.btn_color,
+                        borderRadius: 10,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: colors.theme_fg_two,
+                          fontSize: 16,
+                          color: colors.theme_fg_three,
+                          fontFamily: bold,
+                          padding: 10,
+                        }}
+                      >
+                        Book Self
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={{ margin: 5 }} />
+                    <TouchableOpacity
+                      onPress={() => add_contact_RBSheet.current.open()}
+                      activeOpacity={1}
+                      style={{
+                        width: "45%",
+                        backgroundColor: colors.btn_color,
+                        borderRadius: 10,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: colors.theme_fg_two,
+                          fontSize: 16,
+                          color: colors.theme_fg_three,
+                          fontFamily: bold,
+                          padding: 10,
+                        }}
+                      >
+                        Book for others
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View
+                    style={{ height: 50, width: "90%", alignSelf: "center" }}
+                  >
+                    <LottieView
+                      style={{ flex: 1 }}
+                      source={btn_loader}
+                      autoPlay
+                      loop
+                    />
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-                  </>)}
+            </>
+          )}
         </Animated.View>
       </View>
     );
@@ -2498,22 +2604,40 @@ const Dashboard = (props) => {
             style={styles.textinput}
             onChangeText={(TextInputValue) => setContactNumber(TextInputValue)}
           /> */}
-          <PhoneInput 
-            style={{ borderBottomColor: colors.theme_bg_two }}
-            flagStyle={styles.flag_style}
-            ref={inputRef}
-            initialCountry="in" 
-            offset={10}
-            textStyle={styles.country_text}
-            onPressFlag={() => {}}
-            textProps={{
-              placeholder: 'Enter Contact Number',
-              placeholderTextColor: colors.theme_fg_two
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
-            onChangePhoneNumber={(TextInputValue) => setContactNumber(TextInputValue)}
-            autoFormat={true}
-            
-             />
+          >
+            <PhoneInput
+              style={{ borderBottomColor: colors.theme_bg_two, width: "90%" }}
+              flagStyle={styles.flag_style}
+              ref={inputRef}
+              initialValue={`+91 ${number ? trimCountryCode(number) : ""}`}
+              initialCountry="in"
+              offset={10}
+              textStyle={styles.country_text}
+              onPressFlag={() => {}}
+              textProps={{
+                placeholder: "Enter Contact Number",
+                placeholderTextColor: colors.theme_fg_two,
+              }}
+              onChangePhoneNumber={(TextInputValue) =>
+                setContactNumber(TextInputValue)
+              }
+              autoFormat={true}
+            />
+            <TouchableOpacity onPress={handleContacts}>
+              <Icon
+                type={Icons.MaterialIcons}
+                name="contacts"
+                color={colors.icon_inactive_color}
+                style={{ fontSize: 26 }}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={{ margin: 10 }} />
         <View style={{ flexDirection: "row", width: "100%" }}>
@@ -2610,7 +2734,7 @@ const Dashboard = (props) => {
       })
       .catch((error) => {
         setLoading(false);
-        console.log('cancel request func ',error);
+        console.log("cancel request func ", error);
       });
   };
 
@@ -2618,61 +2742,61 @@ const Dashboard = (props) => {
     return (
       <Modal isVisible={search_status} width="90%">
         {/* <Dialog.Description> */}
-          <View
+        <View
+          style={{
+            padding: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: colors.theme_bg_three,
+          }}
+        >
+          <View style={{ alignItems: "center", padding: 20 }}>
+            <LottieView
+              style={{ height: 100, width: 100 }}
+              source={search_loader}
+              autoPlay
+              loop
+            />
+          </View>
+          <Text
             style={{
-              padding: 10,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: colors.theme_bg_three,
+              fontSize: 13,
+              fontFamily: bold,
+              color: colors.theme_fg_two,
             }}
           >
-            <View style={{ alignItems: "center", padding: 20 }}>
+            Please wait while searching the driver...
+          </Text>
+          <View style={{ margin: 10 }} />
+          {loading == false ? (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              activeOpacity={1}
+              onPress={cancel_request.bind(this)}
+            >
+              <Text
+                onPress={cancel_request.bind(this)}
+                style={{
+                  color: "red",
+                  fontSize: f_m,
+                  fontFamily: bold,
+                  alignSelf: "center",
+                }}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={{ height: 50, width: "100%", alignSelf: "center" }}>
               <LottieView
-                style={{ height: 100, width: 100 }}
-                source={search_loader}
+                style={{ flex: 1 }}
+                source={btn_loader}
                 autoPlay
                 loop
               />
             </View>
-            <Text
-              style={{
-                fontSize: 13,
-                fontFamily: bold,
-                color: colors.theme_fg_two,
-              }}
-            >
-              Please wait while searching the driver...
-            </Text>
-            <View style={{ margin: 10 }} />
-            {loading == false ? (
-              <TouchableOpacity
-                style={{ padding: 10 }}
-                activeOpacity={1}
-                onPress={cancel_request.bind(this)}
-              >
-                <Text
-                  onPress={cancel_request.bind(this)}
-                  style={{
-                    color: "red",
-                    fontSize: f_m,
-                    fontFamily: bold,
-                    alignSelf: "center",
-                  }}
-                >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <View style={{ height: 50, width: "100%", alignSelf: "center" }}>
-                <LottieView
-                  style={{ flex: 1 }}
-                  source={btn_loader}
-                  autoPlay
-                  loop
-                />
-              </View>
-            )}
-          </View>
+          )}
+        </View>
         {/* </Dialog.Description> */}
       </Modal>
     );
@@ -2931,8 +3055,8 @@ const styles = StyleSheet.create({
   },
   flag_style: {
     width: 38,
-    height: 24
-},
+    height: 24,
+  },
   segment_active_bg: {
     width: "48%",
     alignItems: "center",
@@ -2979,8 +3103,8 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     height: 35,
     fontFamily: regular,
-    color: colors.theme_fg_two
-},
+    color: colors.theme_fg_two,
+  },
 });
 
 function mapStateToProps(state) {

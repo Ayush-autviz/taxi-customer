@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import {
   bold,
@@ -15,20 +15,30 @@ import {
   LATITUDE_DELTA,
   LONGITUDE_DELTA,
   app_settings,
-  api_url
+  api_url,
 } from "../config/Constants";
-import messaging from '@react-native-firebase/messaging';
+import messaging from "@react-native-firebase/messaging";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import * as colors from "../assets/css/Colors";
-import { connect } from 'react-redux';
-import { initialLat, initialLng, initialRegion } from '../actions/BookingActions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Geolocation from '@react-native-community/geolocation';
-import VersionNumber from 'react-native-version-number';
-import { isLocationEnabled, promptForEnableLocationIfNeeded, } from 'react-native-android-location-enabler';
-import axios from 'axios';
+import { connect } from "react-redux";
+import {
+  initialLat,
+  initialLng,
+  initialRegion,
+} from "../actions/BookingActions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Geolocation from "@react-native-community/geolocation";
+import VersionNumber from "react-native-version-number";
+import {
+  isLocationEnabled,
+  promptForEnableLocationIfNeeded,
+} from "react-native-android-location-enabler";
+import axios from "axios";
 import { addEventListener } from "@react-native-community/netinfo";
-import DropdownAlert, { DropdownAlertData, DropdownAlertType, } from 'react-native-dropdownalert';
+import DropdownAlert, {
+  DropdownAlertData,
+  DropdownAlertType,
+} from "react-native-dropdownalert";
 
 const Splash = (props) => {
   const navigation = useNavigation();
@@ -39,49 +49,48 @@ const Splash = (props) => {
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  
+
     if (enabled) {
-      console.log('Authorization status:', authStatus);
+      console.log("Authorization status:", authStatus);
     }
   }
 
   useEffect(() => {
     requestUserPermission();
     checkToken();
-    const unsubscribe = addEventListener(state => {
+    const unsubscribe = addEventListener((state) => {
       console.log("Connection type", state.type);
       console.log("Is connected?", state.isConnected);
-      if(state.isConnected == true){
+      if (state.isConnected == true) {
         check_data();
         // channel_create();
         // configure();
-        
-      }else{
+      } else {
         dropDownAlertRef({
           type: DropdownAlertType.Error,
-          title: 'Internet connection error',
-          message: 'Please enable your internet connection',
+          title: "Internet connection error",
+          message: "Please enable your internet connection",
         });
       }
     });
-   //getInitialLocation();
+    //getInitialLocation();
     unsubscribe();
   }, []);
 
   const checkToken = async () => {
     try {
       const fcmToken = await messaging().getToken();
-      console.log('fcm_token:' + fcmToken);
+      console.log("fcm_token:" + fcmToken);
     } catch (error) {
       console.log(error);
-    } 
+    }
     if (fcmToken) {
-      global.fcm_token = fcmToken
+      global.fcm_token = fcmToken;
       check_data();
     } else {
-      Alert.alert('Sorry unable to get your token');
+      Alert.alert("Sorry unable to get your token");
     }
-  }
+  };
 
   const check_data = async () => {
     if (Platform.OS == "android") {
@@ -89,9 +98,9 @@ const Splash = (props) => {
       // global.fcm_token = '123456'
     } else {
       call_settings();
-      global.fcm_token = '123456'
+      global.fcm_token = "123456";
     }
-  }
+  };
 
   // const channel_create = () => {
   //   PushNotification.createChannel(
@@ -162,81 +171,87 @@ const Splash = (props) => {
   //   });
   // }
 
-
   const check_location = async () => {
     if (Platform.OS === "android") {
       promptForEnableLocationIfNeeded({ interval: 10000, fastInterval: 5000 })
-        .then(async data => {
+        .then(async (data) => {
           try {
             const granted = await PermissionsAndroid.request(
-              PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
-              'title': 'App Access your location for tracking in background',
-              'message': app_name + ' will track your location in background when the app is closed or not in use.'
-            }
-            )
+              PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+              {
+                title: "App Access your location for tracking in background",
+                message:
+                  app_name +
+                  " will track your location in background when the app is closed or not in use.",
+              }
+            );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
               await getInitialLocation();
             } else {
-              navigation.navigate('LocationEnable');
-              alert('Sorry unable to fetch your location');
+              navigation.navigate("LocationEnable");
+              alert("Sorry unable to fetch your location");
             }
           } catch (err) {
-            console.log(err)
-            console.log(1)
-            navigation.navigate('LocationEnable');
+            console.log(err);
+            console.log(1);
+            navigation.navigate("LocationEnable");
           }
-        }).catch(err => {
-          console.log(err)
-          console.log(2)
-          navigation.navigate('LocationEnable');
+        })
+        .catch((err) => {
+          console.log(err);
+          console.log(2);
+          navigation.navigate("LocationEnable");
         });
     } else {
       await getInitialLocation();
     }
-  }
+  };
 
   const getInitialLocation = async () => {
-    Geolocation.getCurrentPosition(async (position) => {
-      console.log(position,'position');
-      let location = position.coords;
-      let region = {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA
-      }
-      await props.initialRegion(region);
-      await props.initialLat(location.latitude);
-      await props.initialLng(location.longitude);
-      navigate();
-    }, error => {
-     // navigate();
-     navigation.navigate('LocationEnable')
-    },
-      { enableHighAccuracy: false, timeout: 10000 });
-  }
+    Geolocation.getCurrentPosition(
+      async (position) => {
+        console.log(position, "position");
+        let location = position.coords;
+        let region = {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        };
+        await props.initialRegion(region);
+        await props.initialLat(location.latitude);
+        await props.initialLng(location.longitude);
+        navigate();
+      },
+      (error) => {
+        // navigate();
+        navigation.navigate("LocationEnable");
+      },
+      { enableHighAccuracy: false, timeout: 10000 }
+    );
+  };
 
   const call_settings = async () => {
     await axios({
-      method: 'get',
-      url: api_url + app_settings
+      method: "get",
+      url: api_url + app_settings,
     })
-      .then(async response => {
+      .then(async (response) => {
         home(response.data.result);
       })
-      .catch(error => {
-        console.log(error)
+      .catch((error) => {
+        console.log(error);
       });
-  }
+  };
 
   const home = async (data) => {
-    global.lang = 'en';
-    const id = await AsyncStorage.getItem('id');
-    const first_name = await AsyncStorage.getItem('first_name');
-    const profile_picture = await AsyncStorage.getItem('profile_picture');
-    const phone_with_code = await AsyncStorage.getItem('phone_with_code');
-    const email = await AsyncStorage.getItem('email');
-    const lang = await AsyncStorage.getItem('lang');
+    global.lang = "en";
+    const id = await AsyncStorage.getItem("id");
+    const first_name = await AsyncStorage.getItem("first_name");
+    const profile_picture = await AsyncStorage.getItem("profile_picture");
+    const phone_with_code = await AsyncStorage.getItem("phone_with_code");
+    const email = await AsyncStorage.getItem("email");
+    const lang = await AsyncStorage.getItem("lang");
     global.existing = await AsyncStorage.getItem("existing");
     global.stripe_key = await data.stripe_key;
     global.razorpay_key = await data.razorpay_key;
@@ -262,7 +277,7 @@ const Splash = (props) => {
       global.id = 0;
       check_location();
     }
-  }
+  };
 
   const navigate = () => {
     // navigation.dispatch(
@@ -295,19 +310,15 @@ const Splash = (props) => {
         })
       );
     }
-  }
+  };
 
   return (
     <TouchableOpacity activeOpacity={1} style={styles.background}>
-      <StatusBar
-        backgroundColor={colors.theme_bg}
-      />
+      <StatusBar backgroundColor={colors.theme_bg} />
       <View style={styles.logo_container}>
-
         <Image style={styles.logo} source={logo} />
-
       </View>
-      <DropdownAlert alert={func => (dropDownAlertRef = func)} />
+      <DropdownAlert alert={(func) => (dropDownAlertRef = func)} />
     </TouchableOpacity>
   );
 };
@@ -324,10 +335,10 @@ const styles = StyleSheet.create({
     height: 200,
   },
   logo: {
-    width:300,
-    resizeMode:'contain',
+    width: 300,
+    resizeMode: "contain",
     flex: 1,
-    borderRadius: 10
+    borderRadius: 10,
   },
   spl_text: {
     fontFamily: bold,
@@ -348,7 +359,7 @@ function mapStateToProps(state) {
 const mapDispatchToProps = (dispatch) => ({
   initialLat: (data) => dispatch(initialLat(data)),
   initialLng: (data) => dispatch(initialLng(data)),
-  initialRegion: (data) => dispatch(initialRegion(data))
+  initialRegion: (data) => dispatch(initialRegion(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Splash);
