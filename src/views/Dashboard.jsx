@@ -277,6 +277,8 @@ const Dashboard = (props) => {
           // Optionally, show a message explaining how to enable permission manually in settings
         }
       }
+    }else{
+      getContacts();
     }
   };
 

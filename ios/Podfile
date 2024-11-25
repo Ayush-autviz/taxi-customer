@@ -27,7 +27,7 @@ end
 
 target 'taxi2door_customer' do
   config = use_native_modules!
-
+  # pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
   rn_maps_path = '../node_modules/react-native-maps'
   pod 'react-native-google-maps', :path => rn_maps_path
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
@@ -40,6 +40,7 @@ target 'taxi2door_customer' do
 
   use_react_native!(
     :path => config[:reactNativePath],
+    
     
     # Enables Flipper.
     #

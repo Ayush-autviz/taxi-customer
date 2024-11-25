@@ -958,7 +958,13 @@ function App() {
         <Stack.Screen
           name="ContactList"
           component={ContactList}
-          options={{ headerShown: false }}
+          options={{
+            headerTitle: 'Contacts',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+            headerShown: true,  // Ensure the header is visible
+          }} 
         />
       </Stack.Navigator>
     </NavigationContainer>
