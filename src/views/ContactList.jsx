@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,21 +10,21 @@ import {
 } from "react-native";
 import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import FeatherIcon from 'react-native-vector-icons/Feather';
+import FeatherIcon from "react-native-vector-icons/Feather";
+import { theme_bg } from "../assets/css/Colors";
 
 const ContactList = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const CONTACTS = route.params.filteredContacts;
 
-
-  console.log(CONTACTS,"contacts")
+  console.log(CONTACTS, "contacts");
 
   const sections = React.useMemo(() => {
     const sectionsMap = CONTACTS.reduce((acc, item) => {
       const fullName = `${item.givenName} ${item.familyName}`; // Concatenate the names
 
-      const [lastName] = fullName.trim().split(' ');
+      const [lastName] = fullName.trim().split(" ");
 
       return Object.assign(acc, {
         [lastName[0]]: [...(acc[lastName[0]] || []), item],
@@ -38,10 +39,10 @@ const ContactList = () => {
       .sort((a, b) => a.letter.localeCompare(b.letter));
   }, []);
 
- // console.log(contacts, "CoNTACTS");
+  // console.log(contacts, "CoNTACTS");
 
   return (
-    <SafeAreaView style={{ backgroundColor: '#f2f2f2' }}>
+    <SafeAreaView style={{ backgroundColor: "#f2f2f2" }}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* <View style={styles.header}>
           <Text style={styles.title}>Contacts</Text>
@@ -51,48 +52,60 @@ const ContactList = () => {
           <View style={styles.section} key={letter}>
             <Text style={styles.sectionTitle}>{letter}</Text>
             <View style={styles.sectionItems}>
-              {items.map(({ img, givenName:displayName, phoneNumbers }, index) => {
-                return (
-                  <View key={index} style={styles.cardWrapper}>
-                    <TouchableOpacity
-onPress={() =>
-  navigation.navigate("Dashboard", {
-    number: phoneNumbers[0]?.number,
-    from: "ContactList",
-  })
-}
-
+              {items.map(
+                (
+                  { img, givenName: displayName, familyName, phoneNumbers },
+                  index
+                ) => {
+                  return (
+                    <View key={index} style={styles.cardWrapper}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("Dashboard", {
+                            number: phoneNumbers[0]?.number,
+                            from: "ContactList",
+                          })
+                        }
                       >
-                      <View style={styles.card}>
-                        {img ? (
-                          <Image
-                            alt=""
-                            resizeMode="cover"
-                            source={{ uri: img }}
-                            style={styles.cardImg} />
-                        ) : (
-                          <View style={[styles.cardImg, styles.cardAvatar]}>
-                            <Text style={styles.cardAvatarText}>{displayName[0]}</Text>
+                        <View style={styles.card}>
+                          {img ? (
+                            <Image
+                              alt=""
+                              resizeMode="cover"
+                              source={{ uri: img }}
+                              style={styles.cardImg}
+                            />
+                          ) : (
+                            <View style={[styles.cardImg, styles.cardAvatar]}>
+                              <Text style={styles.cardAvatarText}>
+                                {displayName[0]}
+                              </Text>
+                            </View>
+                          )}
+
+                          <View style={styles.cardBody}>
+                            <Text style={styles.cardTitle}>
+                              {displayName} {familyName}
+                            </Text>
+
+                            <Text style={styles.cardPhone}>
+                              {phoneNumbers[0]?.number}
+                            </Text>
                           </View>
-                        )}
 
-                        <View style={styles.cardBody}>
-                          <Text style={styles.cardTitle}>{displayName}</Text>
-
-                          <Text style={styles.cardPhone}>{phoneNumbers[0]?.number}</Text>
+                          <View style={styles.cardAction}>
+                            <FeatherIcon
+                              color="#9ca3af"
+                              name="chevron-right"
+                              size={22}
+                            />
+                          </View>
                         </View>
-
-                        <View style={styles.cardAction}>
-                          <FeatherIcon
-                            color="#9ca3af"
-                            name="chevron-right"
-                            size={22} />
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
+                      </TouchableOpacity>
+                    </View>
+                  );
+                }
+              )}
             </View>
           </View>
         ))}
@@ -102,8 +115,6 @@ onPress={() =>
 };
 
 export default ContactList;
-
-
 
 // import React from 'react';
 // import {
@@ -236,7 +247,7 @@ export default ContactList;
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 24,
+    // paddingVertical: 12,
     paddingHorizontal: 0,
   },
   header: {
@@ -244,8 +255,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#1d1d1d',
+    fontWeight: "700",
+    color: "#1d1d1d",
     marginBottom: 12,
   },
   /** Section */
@@ -255,8 +266,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
   },
   sectionItems: {
     marginTop: 8,
@@ -264,13 +275,13 @@ const styles = StyleSheet.create({
   /** Card */
   card: {
     paddingVertical: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
   cardWrapper: {
     borderBottomWidth: 1,
-    borderColor: '#d6d6d6',
+    borderColor: "#d6d6d6",
   },
   cardImg: {
     width: 42,
@@ -278,30 +289,31 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   cardAvatar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#9ca1ac',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    // backgroundColor: "#9ca1ac",
+    backgroundColor: theme_bg,
   },
   cardAvatarText: {
     fontSize: 19,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   cardBody: {
-    marginRight: 'auto',
+    marginRight: "auto",
     marginLeft: 12,
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
   },
   cardPhone: {
     fontSize: 15,
     lineHeight: 20,
-    fontWeight: '500',
-    color: '#616d79',
+    fontWeight: "500",
+    color: "#616d79",
     marginTop: 3,
   },
   cardAction: {

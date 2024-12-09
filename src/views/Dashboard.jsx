@@ -16,6 +16,7 @@ import {
   TextInput,
   Alert,
   PermissionsAndroid,
+  ActivityIndicator,
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -237,6 +238,9 @@ const Dashboard = (props) => {
           (contact) => contact.phoneNumbers && contact.phoneNumbers.length > 0
         );
         // setcontactList(filteredContacts);
+        add_contact_RBSheet.current.close();
+
+        setSearchLoading(false);
         navigation.navigate("ContactList", { filteredContacts });
       })
       .catch((e) => {
@@ -277,13 +281,14 @@ const Dashboard = (props) => {
           // Optionally, show a message explaining how to enable permission manually in settings
         }
       }
-    }else{
+    } else {
       getContacts();
     }
   };
 
   const handleContacts = () => {
-    add_contact_RBSheet.current.close();
+    // add_contact_RBSheet.current.close();
+    setSearchLoading(true);
     requestContactsPermission();
     // navigation.navigate("ContactList", { contacts: contactList });
   };
@@ -2631,13 +2636,20 @@ const Dashboard = (props) => {
               }
               autoFormat={true}
             />
-            <TouchableOpacity onPress={handleContacts}>
-              <Icon
-                type={Icons.MaterialIcons}
-                name="contacts"
-                color={colors.icon_inactive_color}
-                style={{ fontSize: 26 }}
-              />
+            <TouchableOpacity
+              disabled={search_loading}
+              onPress={handleContacts}
+            >
+              {search_loading ? (
+                <ActivityIndicator size={24} color="black" />
+              ) : (
+                <Icon
+                  type={Icons.MaterialIcons}
+                  name="contacts"
+                  color={colors.icon_inactive_color}
+                  style={{ fontSize: 26 }}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -2663,6 +2675,7 @@ const Dashboard = (props) => {
                 alignItems: "center",
                 justifyContent: "center",
               }}
+              disabled={search_loading}
             >
               <Text
                 style={{
@@ -2697,6 +2710,7 @@ const Dashboard = (props) => {
                 alignItems: "center",
                 justifyContent: "center",
               }}
+              disabled={search_loading}
             >
               <Text
                 style={{
